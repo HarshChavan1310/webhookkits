@@ -34,12 +34,22 @@ const verifyWebhookSignature = (req) => {
 // Create customer on Interakt
 const createInteraktCustomer = async (customerData) => {
   try {
+    console.log('Creating customer on Interakt with data:', {
+      userId: customerData.id,
+      phoneNumber: customerData.contact,
+      countryCode: '+91'
+    });
+    
+    // Log the API key format (first few characters only for security)
+    const apiKeyPreview = process.env.INTERAKT_API_KEY.substring(0, 10) + '...';
+    console.log('Using Interakt API key format:', apiKeyPreview);
+    
     const response = await axios({
       method: 'post',
       url: `https://api.interakt.ai/v1/public/track/users/`,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Basic ${process.env.INTERAKT_API_KEY}`
+        'Authorization': process.env.INTERAKT_API_KEY
       },
       data: {
         userId: customerData.id,
@@ -56,6 +66,7 @@ const createInteraktCustomer = async (customerData) => {
     return response.data;
   } catch (error) {
     console.error('Error creating customer on Interakt:', error.response?.data || error.message);
+    console.error('Full error details:', JSON.stringify(error.response?.headers || {}, null, 2));
     throw error;
   }
 };
@@ -79,7 +90,7 @@ const addTagToCustomer = async (customerId, tag) => {
       url: `https://api.interakt.ai/v1/public/track/users/tags/`,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Basic ${process.env.INTERAKT_API_KEY}`
+        'Authorization': process.env.INTERAKT_API_KEY
       },
       data: requestData
     });
@@ -100,7 +111,7 @@ const sendWhatsAppMessage = async (customerId, templateName, params = []) => {
       url: `https://api.interakt.ai/v1/public/message/`,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Basic ${process.env.INTERAKT_API_KEY}`
+        'Authorization': process.env.INTERAKT_API_KEY
       },
       data: {
         userId: customerId,
