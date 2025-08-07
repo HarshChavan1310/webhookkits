@@ -136,8 +136,8 @@ app.post('/webhook/razorpay', async (req, res) => {
     const event = req.body.event;
     console.log('Received webhook event:', event);
     
-    // Handle payment.authorized event
-    if (event === 'payment.authorized') {
+    // Handle payment.authorized or payment.captured events
+    if (event === 'payment.authorized' || event === 'payment.captured') {
       const payment = req.body.payload.payment.entity;
       const order = req.body.payload.payment.entity.order_id;
       
